@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Braeden Berg — Data Analytics Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0f0f0f;
+      --white: #fafaf8;
+      --gray: #888880;
+      --light: #f0efe9;
+      --accent: #1a3a6b;
+      --accent-light: #e8edf5;
+      --border: #e2e1da;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--white);
+      color: var(--black);
+      font-size: 16px;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 4rem;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--black);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--black); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 4rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 860px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.1s;
+    }
+
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 1.0;
+      color: var(--black);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.2s;
+    }
+
+    .hero-name em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--gray);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.35s;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.5s;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--black);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--black);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--light);
+      border-color: var(--black);
+    }
+
+    /* decorative line */
+    .hero-line {
+      position: absolute;
+      right: 4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 40vh;
+      background: linear-gradient(to bottom, transparent, var(--border), transparent);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 0.8s;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem 4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--gray);
+      font-weight: 500;
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      display: block;
+      height: 1px;
+      width: 3rem;
+      background: var(--border);
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+
+    /* ── ABOUT ── */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+      max-width: 1000px;
+    }
+
+    .about-text {
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.8;
+    }
+
+    .about-text p + p { margin-top: 1rem; }
+
+    .about-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .detail-item {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-item:last-child { border-bottom: none; }
+
+    .detail-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gray);
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+
+    .detail-value {
+      font-size: 0.95rem;
+      color: var(--black);
+      font-weight: 400;
+    }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--light); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+    }
+
+    .skill-group {
+      padding: 1.75rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+    }
+
+    .skill-group-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .skill-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .skill-list li {
+      font-size: 0.9rem;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .skill-list li::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── PROJECT ── */
+    .project-card {
+      max-width: 1000px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .project-preview {
+      width: 100%;
+      height: 420px;
+      border: none;
+      display: block;
+      background: var(--light);
+    }
+
+    .project-info {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .project-title {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.75rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ── RESUME ── */
+    #resume {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .resume-left .section-title { margin-bottom: 0.75rem; }
+
+    .resume-sub {
+      font-size: 0.95rem;
+      color: var(--gray);
+      max-width: 400px;
+    }
+
+    /* ── CONTACT ── */
+    #contact .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      max-width: 1000px;
+      align-items: start;
+    }
+
+    .contact-text {
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .contact-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .contact-item-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .contact-item-value {
+      font-size: 0.95rem;
+      color: var(--black);
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero, section { padding: 5rem 1.5rem 3rem; }
+      #about .about-grid,
+      #contact .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      #resume { flex-direction: column; align-items: flex-start; }
+      .hero-line { display: none; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo">Braeden Berg</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#resume">Resume</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-inner">
+      <span class="hero-tag">Data Analytics &amp; Information Systems</span>
+      <h1 class="hero-name">Braeden<br><em>Berg</em></h1>
+      <p class="hero-sub">MIS student, data analyst in training, and detail-oriented problem solver. I turn messy datasets into clear insights.</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      </div>
+    </div>
+    <div class="hero-line"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label">About Me</div>
+    <div class="about-grid reveal">
+      <div>
+        <h2 class="section-title">Analytical thinker with real-world experience.</h2>
+        <div class="about-text">
+          <p>I'm Braeden — an Honors Management Information Systems student at Metropolitan State University, on track to graduate Summer 2026. I'm passionate about applying data analytics to solve real business problems and eager to bring that curiosity into a professional setting.</p>
+          <p>Beyond the classroom, I've worked in healthcare data collection at the American Red Cross, financial data processing at a Minnesota bank, and logistics operations at FedEx — giving me a grounded, practical perspective on how data flows through real organizations.</p>
+        </div>
+      </div>
+      <div class="about-details">
+        <div class="detail-item">
+          <div class="detail-label">Currently</div>
+          <div class="detail-value">B.S. Management Information Systems (Honors)<br>Metropolitan State University</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Expected Graduation</div>
+          <div class="detail-value">Summer 2026</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Location</div>
+          <div class="detail-value">Rosemount, MN</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Certifications</div>
+          <div class="detail-value">Google Data Analytics Certificate<br>Learning Excel: Data Analysis Certificate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label">Skills</div>
+    <h2 class="section-title reveal">Tools &amp; competencies.</h2>
+    <div class="skills-grid reveal">
+      <div class="skill-group">
+        <div class="skill-group-title">Data & Analytics</div>
+        <ul class="skill-list">
+          <li>SQL</li>
+          <li>Microsoft Excel (Advanced)</li>
+          <li>Tableau</li>
+          <li>R Programming</li>
+          <li>Data Visualization</li>
+          <li>Pivot Tables & Reporting</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Technical</div>
+        <ul class="skill-list">
+          <li>Microsoft Office Suite</li>
+          <li>Database Management</li>
+          <li>Data Cleaning</li>
+          <li>Business Intelligence</li>
+          <li>Process Improvement</li>
+          <li>Records Management</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Professional</div>
+        <ul class="skill-list">
+          <li>Analytical Thinking</li>
+          <li>Attention to Detail</li>
+          <li>Client Relations</li>
+          <li>HIPAA Compliance</li>
+          <li>Time Management</li>
+          <li>Independent Worker</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label">Projects</div>
+    <h2 class="section-title reveal">Work I've built.</h2>
+    <div class="project-card reveal">
+      <iframe
+        class="project-preview"
+        src="https://public.tableau.com/views/Medicare_Provider_Payment_Analysis/Dashboard1?:language=en-US&:embed=true&:display_count=n&:origin=viz_share_link&:toolbar=no"
+        allowfullscreen>
+      </iframe>
+      <div class="project-info">
+        <div>
+          <div class="project-title">Medicare Provider Payment Analysis</div>
+          <div class="project-desc">Cleaned and analyzed a 100,000+ row CMS Medicare dataset to uncover reimbursement trends across medical specialties and U.S. states. Built pivot tables identifying top-paying specialties, highest-volume states, and the relationship between claim volume and average payments. Visualized findings in an interactive three-chart Tableau dashboard.</div>
+          <div class="project-tags">
+            <span class="tag">Excel</span>
+            <span class="tag">Tableau</span>
+            <span class="tag">CMS Data</span>
+            <span class="tag">Healthcare Analytics</span>
+            <span class="tag">Data Cleaning</span>
+          </div>
+        </div>
+        <a href="https://public.tableau.com/views/Medicare_Provider_Payment_Analysis/Dashboard1" target="_blank" class="btn btn-primary">View Live →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESUME -->
+  <section id="resume">
+    <div class="resume-left reveal">
+      <div class="section-label">Resume</div>
+      <h2 class="section-title">Want the full picture?</h2>
+      <p class="resume-sub">Download my resume for a complete look at my education, experience, and certifications.</p>
+    </div>
+    <a href="Braeden_Berg_Resume.docx" download class="btn btn-primary reveal">Download Resume ↓</a>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label">Contact</div>
+    <div class="contact-grid">
+      <div class="reveal">
+        <h2 class="section-title">Let's talk.</h2>
+        <p class="contact-text">I'm actively looking for data analyst, business analyst, or information systems opportunities. If you think I'd be a good fit for your team, I'd love to hear from you.</p>
+        <div class="contact-detail">
+          <div class="contact-item">
+            <span class="contact-item-label">Email</span>
+            <span class="contact-item-value">braedenberg@gmail.com</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-item-label">Phone</span>
+            <span class="contact-item-value">(218) 252-5312</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-item-label">Location</span>
+            <span class="contact-item-value">Rosemount, MN</span>
+          </div>
+        </div>
+      </div>
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" placeholder="Jane Smith" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Your Email</label>
+          <input type="email" id="email" placeholder="jane@company.com" required />
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" rows="5" placeholder="Tell me about the opportunity..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-btn">Send Message →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 Braeden Berg</span>
+    <span>Built for opportunities in Data Analytics &amp; MIS</span>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Contact form handler
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      btn.textContent = 'Sending...';
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        btn.textContent = 'Message Sent ✓';
+        btn.style.background = '#1a6b3a';
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('message').value = '';
+      }, 1000);
+      // To make the form actually send, replace this with a service like Formspree:
+      // fetch('https://formspree.io/f/YOUR_ID', { method: 'POST', body: new FormData(e.target) })
+    }
+  </script>
+
+</body>
+</html>
