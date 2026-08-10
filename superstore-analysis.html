@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Superstore Sales Analysis — Braeden Berg, Data Analyst" />
+  <title>Case No. 25-02 — Superstore Sales Analysis · Braeden Berg</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a1a;
+      --muted: #6b6b6b;
+      --faint: #999;
+      --rule: #d8d8d8;
+      --bg: #f9f8f5;
+      --paper: #ffffff;
+      --accent: #1a1a1a;
+      --mono: 'Courier New', Courier, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--rule);
+      padding: 1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.75rem; align-items: center; }
+    .nav-links a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: .03em;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-back {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--rule);
+      padding: .3rem .75rem;
+      border-radius: 2px;
+    }
+    .nav-back:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* LAYOUT */
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* HEADER */
+    .case-header {
+      padding: 3.5rem 0 2.5rem;
+      border-bottom: 2px solid var(--ink);
+    }
+    .case-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .case-meta span { display: flex; align-items: center; gap: .4rem; }
+    .case-meta .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--muted);
+      display: inline-block;
+    }
+    .case-title {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: .75rem;
+    }
+    .case-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 1.75rem;
+    }
+    .tag-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .25rem .6rem;
+      border: 1px solid var(--rule);
+      color: var(--muted);
+      border-radius: 2px;
+    }
+    .tag.filled {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+    .header-cta { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    .btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .55rem 1.1rem;
+      border-radius: 2px;
+      display: inline-block;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .75; }
+    .btn-primary { background: var(--ink); color: white; }
+    .btn-ghost { border: 1px solid var(--rule); color: var(--muted); }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--rule);
+    }
+    .stat {
+      padding: 1.5rem 0;
+      border-right: 1px solid var(--rule);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-n {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: -.03em;
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+    .stat-l {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .02em;
+    }
+
+    /* SECTION */
+    section { padding: 3rem 0; border-bottom: 1px solid var(--rule); }
+    section:last-child { border-bottom: none; }
+
+    .section-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .section-eyebrow::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+    .section-h {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: .75rem;
+    }
+    .section-p {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 580px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* OBJECTIVE LIST */
+    .obj-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .obj-list li {
+      display: flex;
+      gap: .75rem;
+      font-size: 13px;
+      color: var(--muted);
+      align-items: flex-start;
+    }
+    .obj-list li::before {
+      content: '—';
+      font-family: var(--mono);
+      color: var(--rule);
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+
+    /* STEP */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      border: 1px solid var(--rule);
+      border-bottom: none;
+      background: var(--paper);
+    }
+    .step:first-child { border-radius: 4px 4px 0 0; }
+    .step:last-child { border-bottom: 1px solid var(--rule); border-radius: 0 0 4px 4px; }
+
+    .step-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid transparent;
+      transition: background .15s;
+    }
+    .step-header:hover { background: var(--bg); }
+    .step-header.open { border-bottom-color: var(--rule); background: var(--bg); }
+
+    .step-n {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      padding: .2rem .5rem;
+      border-radius: 2px;
+      flex-shrink: 0;
+      letter-spacing: .06em;
+    }
+    .step-title-text {
+      font-size: 13px;
+      font-weight: 600;
+      flex: 1;
+    }
+    .step-chevron {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform .2s;
+    }
+    .step-header.open .step-chevron { transform: rotate(180deg); }
+
+    .step-body {
+      display: none;
+      padding: 1.5rem 1.25rem;
+    }
+    .step-body.open { display: block; }
+
+    .step-desc-text {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      max-width: 540px;
+    }
+
+    /* CODE */
+    .code-block {
+      background: #1a1a1a;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .code-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .5rem 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .code-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .code-dots { display: flex; gap: .35rem; }
+    .code-dots span { width: 9px; height: 9px; border-radius: 50%; background: #333; }
+    pre {
+      padding: 1rem 1.25rem;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.8;
+      color: #e0e0e0;
+      overflow-x: auto;
+    }
+    .kw { color: #89b4fa; }
+    .fn { color: #a6e3a1; }
+    .str { color: #f9e2af; }
+    .cm { color: #555; font-style: italic; }
+    .op { color: #cba6f7; }
+
+    /* FINDING BOX */
+    .finding-box {
+      border-left: 2px solid var(--ink);
+      padding: .75rem 1rem;
+      background: var(--bg);
+      border-radius: 0 2px 2px 0;
+    }
+    .finding-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+    .finding-text {
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    /* DASHBOARD */
+    .dashboard-frame {
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--paper);
+    }
+    .dashboard-frame iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      display: block;
+    }
+    .dashboard-caption {
+      padding: .75rem 1rem;
+      border-top: 1px solid var(--rule);
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* KEY FINDINGS */
+    .findings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .finding-card {
+      background: var(--paper);
+      padding: 1.25rem 1.5rem;
+    }
+    .fc-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .4rem;
+    }
+    .fc-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -.03em;
+      margin-bottom: .2rem;
+    }
+    .fc-desc { font-size: 12px; color: var(--muted); }
+
+    /* STAMP */
+    .stamp-row {
+      padding: 2rem 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .stamp {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--rule);
+      padding: .5rem 1rem;
+      border-radius: 2px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .stamp strong { color: var(--ink); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.75rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer p { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    footer a { color: var(--ink); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .wrap { padding: 0 1.25rem; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .findings-grid { grid-template-columns: 1fr; }
+      .case-meta { gap: .75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://braedenberg13.github.io" class="nav-name">Braeden Berg</a>
+  <div class="nav-links">
+    <a href="https://braedenberg13.github.io#work">Work</a>
+    <a href="https://braedenberg13.github.io#skills">Skills</a>
+    <a href="https://braedenberg13.github.io/resume.pdf" target="_blank">Resume</a>
+    <a href="https://braedenberg13.github.io" class="nav-back">← Back</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- CASE HEADER -->
+  <header class="case-header">
+    <div class="case-meta">
+      <span>Case No. 25-02</span>
+      <span class="dot"></span>
+      <span>Retail / E-Commerce</span>
+      <span class="dot"></span>
+      <span>MySQL · Tableau</span>
+    </div>
+    <h1 class="case-title">Superstore Sales<br>Analysis</h1>
+    <p class="case-sub">Five SQL queries against 9,800 retail orders to identify where revenue comes from — by region, product, category, segment, and year — then visualized in a Tableau dashboard.</p>
+    <div class="tag-row">
+      <span class="tag filled">MySQL</span>
+      <span class="tag filled">Tableau</span>
+      <span class="tag">GROUP BY</span>
+      <span class="tag">Aggregation</span>
+      <span class="tag">Dashboard Design</span>
+      <span class="tag">Business Intelligence</span>
+    </div>
+    <div class="header-cta">
+      <a href="https://public.tableau.com/app/profile/braeden.berg/viz/SuperstoreSalesAnalysis_17863996966070/SuperstoreSalesAnalysis" target="_blank" class="btn btn-primary">View dashboard ↗</a>
+      <a href="https://github.com/braedenberg13" target="_blank" class="btn btn-ghost">GitHub</a>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-n">9,800</div>
+      <div class="stat-l">Rows analyzed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">$2.26M</div>
+      <div class="stat-l">Total revenue</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">5</div>
+      <div class="stat-l">SQL queries</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">4 yrs</div>
+      <div class="stat-l">Data coverage</div>
+    </div>
+  </div>
+
+  <!-- OBJECTIVE -->
+  <section>
+    <p class="section-eyebrow">01 — Objective</p>
+    <h2 class="section-h">What I set out to answer</h2>
+    <p class="section-p">Simulating the kind of analysis a data analyst would run for a sales or operations team — using raw order data to surface patterns that aren't obvious from a spreadsheet.</p>
+    <ul class="obj-list">
+      <li>Which region drives the most revenue, and by how much?</li>
+      <li>What are the top 10 products by total sales?</li>
+      <li>Which product categories and sub-categories perform best?</li>
+      <li>How does revenue split across Consumer, Corporate, and Home Office segments?</li>
+      <li>How has total revenue and order volume trended year over year?</li>
+    </ul>
+  </section>
+
+  <!-- PROCESS -->
+  <section>
+    <p class="section-eyebrow">02 — Process</p>
+    <h2 class="section-h">Step-by-step</h2>
+    <p class="section-p">Each query was written from scratch in MySQL Workbench against a locally hosted database. Click any step to expand it.</p>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 01</span>
+          <span class="step-title-text">Data import & setup</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Created a dedicated MySQL database, defined a typed table schema matching the CSV columns, then loaded 9,800 rows using LOAD DATA INFILE.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Setup</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">CREATE DATABASE</span> superstore;
+<span class="kw">USE</span> superstore;
+
+<span class="kw">CREATE TABLE</span> orders (
+  row_id        <span class="fn">INT</span>,
+  order_id      <span class="fn">VARCHAR</span>(<span class="str">20</span>),
+  order_date    <span class="fn">VARCHAR</span>(<span class="str">20</span>),
+  ship_date     <span class="fn">VARCHAR</span>(<span class="str">20</span>),
+  ship_mode     <span class="fn">VARCHAR</span>(<span class="str">50</span>),
+  customer_name <span class="fn">VARCHAR</span>(<span class="str">100</span>),
+  segment       <span class="fn">VARCHAR</span>(<span class="str">50</span>),
+  region        <span class="fn">VARCHAR</span>(<span class="str">20</span>),
+  category      <span class="fn">VARCHAR</span>(<span class="str">50</span>),
+  sub_category  <span class="fn">VARCHAR</span>(<span class="str">50</span>),
+  product_name  <span class="fn">VARCHAR</span>(<span class="str">255</span>),
+  sales         <span class="fn">DECIMAL</span>(<span class="str">10,4</span>)
+);
+
+<span class="kw">LOAD DATA INFILE</span> <span class="str">'C:/ProgramData/MySQL/.../superstore.csv'</span>
+<span class="kw">INTO TABLE</span> orders
+<span class="kw">FIELDS TERMINATED BY</span> <span class="str">','</span>
+<span class="kw">ENCLOSED BY</span> <span class="str">'"'</span>
+<span class="kw">LINES TERMINATED BY</span> <span class="str">'\n'</span>
+<span class="kw">IGNORE</span> <span class="str">1</span> <span class="kw">ROWS</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Result</div>
+            <div class="finding-text">9,800 rows imported successfully across 18 columns. Zero errors, zero skipped rows.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 02</span>
+          <span class="step-title-text">Query 1 — Sales by region</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Grouped total revenue by region using SUM() and GROUP BY to understand geographic performance distribution.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Query 1</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">SELECT</span> region, <span class="fn">SUM</span>(sales) <span class="kw">AS</span> total_sales
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> region
+<span class="kw">ORDER BY</span> total_sales <span class="op">DESC</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Finding</div>
+            <div class="finding-text">West led with $710K — 82% more than the South's $389K. The two eastern regions clustered closely in the middle at $492K and $669K.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 03</span>
+          <span class="step-title-text">Query 2 — Top 10 products by sales</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Identified the highest revenue-generating individual products using GROUP BY on product name with a LIMIT of 10.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Query 2</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">SELECT</span> product_name, <span class="fn">SUM</span>(sales) <span class="kw">AS</span> total_sales
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> product_name
+<span class="kw">ORDER BY</span> total_sales <span class="op">DESC</span>
+<span class="kw">LIMIT</span> <span class="str">10</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Finding</div>
+            <div class="finding-text">The Canon imageCLASS 2200 Copier generated $61,600 — more than double the second-place product at $27,453. The top 10 products alone accounted for a disproportionate share of total revenue.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 04</span>
+          <span class="step-title-text">Query 3 — Sales by category & sub-category</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Used a multi-column GROUP BY to break down revenue at the sub-category level within each broader product category.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Query 3</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">SELECT</span> category, sub_category,
+       <span class="fn">SUM</span>(sales) <span class="kw">AS</span> total_sales
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> category, sub_category
+<span class="kw">ORDER BY</span> total_sales <span class="op">DESC</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Finding</div>
+            <div class="finding-text">Technology Phones ($327K) and Furniture Chairs ($322K) were nearly tied at the top. Office Supplies Fasteners generated only $3K — the lowest of 17 sub-categories — suggesting a candidate for de-prioritization.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 05</span>
+          <span class="step-title-text">Query 4 — Sales by customer segment</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Analyzed how total revenue distributed across the three customer segments: Consumer, Corporate, and Home Office.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Query 4</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">SELECT</span> segment, <span class="fn">SUM</span>(sales) <span class="kw">AS</span> total_sales
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> segment
+<span class="kw">ORDER BY</span> total_sales <span class="op">DESC</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Finding</div>
+            <div class="finding-text">Consumer drove $1.1M — nearly double Corporate at $688K. Home Office was the smallest at $425K. Consumer is clearly the core revenue driver and where retention efforts should focus.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step">
+        <div class="step-header" onclick="toggle(this)">
+          <span class="step-n">Step 06</span>
+          <span class="step-title-text">Query 5 — Year over year sales trend</span>
+          <span class="step-chevron">▼</span>
+        </div>
+        <div class="step-body">
+          <p class="step-desc-text">Used SUBSTRING() to extract the year from a text-formatted date column, then grouped revenue and unique order count by year to surface the business growth trajectory.</p>
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-label">SQL — Query 5</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre><span class="kw">SELECT</span>
+  <span class="fn">SUBSTRING</span>(order_date, <span class="str">7</span>, <span class="str">4</span>) <span class="kw">AS</span> year,
+  <span class="fn">SUM</span>(sales)               <span class="kw">AS</span> total_sales,
+  <span class="fn">COUNT</span>(<span class="op">DISTINCT</span> order_id)  <span class="kw">AS</span> total_orders
+<span class="kw">FROM</span> orders
+<span class="kw">GROUP BY</span> year
+<span class="kw">ORDER BY</span> year <span class="op">ASC</span>;</pre>
+          </div>
+          <div class="finding-box">
+            <div class="finding-label">Finding</div>
+            <div class="finding-text">Revenue grew from $459K in 2016 to $722K in 2018 — a 57% increase. Order volume grew from 1,019 to 1,661 over the same period, confirming the growth was driven by volume, not price.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section>
+    <p class="section-eyebrow">03 — Output</p>
+    <h2 class="section-h">Tableau dashboard</h2>
+    <p class="section-p">All five analyses visualized in a single dashboard — bar charts, a treemap, and a line chart combined to tell the full story at a glance.</p>
+    <div class="dashboard-frame">
+      <a href="https://public.tableau.com/app/profile/braeden.berg/viz/SuperstoreSalesAnalysis_17863996966070/SuperstoreSalesAnalysis" target="_blank">
+        <img src="Superstore.png" alt="Superstore Sales Analysis Tableau Dashboard" style="width:100%;display:block;" />
+      </a>
+      <div class="dashboard-caption">
+        <span>Superstore Sales Analysis · Tableau Public</span>
+        <a href="https://public.tableau.com/app/profile/braeden.berg/viz/SuperstoreSalesAnalysis_17863996966070/SuperstoreSalesAnalysis" target="_blank" style="color:var(--ink);text-decoration:none;">Open full screen ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY FINDINGS -->
+  <section>
+    <p class="section-eyebrow">04 — Key findings</p>
+    <h2 class="section-h">What the data showed</h2>
+    <div class="findings-grid" style="margin-top:1.5rem;">
+      <div class="finding-card">
+        <div class="fc-label">Top region</div>
+        <div class="fc-value">West — $710K</div>
+        <div class="fc-desc">82% more than South, the lowest region at $389K</div>
+      </div>
+      <div class="finding-card">
+        <div class="fc-label">Top product</div>
+        <div class="fc-value">Canon Copier — $61K</div>
+        <div class="fc-desc">More than double the second-place product at $27K</div>
+      </div>
+      <div class="finding-card">
+        <div class="fc-label">Largest segment</div>
+        <div class="fc-value">Consumer — $1.1M</div>
+        <div class="fc-desc">Nearly double Corporate; the core revenue driver</div>
+      </div>
+      <div class="finding-card">
+        <div class="fc-label">Revenue growth</div>
+        <div class="fc-value">+57% (2016–18)</div>
+        <div class="fc-desc">Growth driven by volume — orders up 63% over same period</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAMP -->
+  <div class="stamp-row">
+    <span class="stamp">Case No. 25-02 · Superstore Sales · <strong>Verified</strong></span>
+    <span class="stamp">Tools: MySQL · Tableau · <strong>B. Berg</strong></span>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Braeden Berg — <a href="https://braedenberg13.github.io">braedenberg13.github.io</a></p>
+  <p><a href="https://braedenberg13.github.io">← Back to portfolio</a></p>
+</footer>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    header.classList.toggle('open');
+    body.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
